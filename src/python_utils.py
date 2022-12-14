@@ -161,7 +161,7 @@ def diff_image(img1, img2):
 
     fig, ax = plt.subplots(1, 3, figsize=(15, 15))
     ax[0].imshow(img1)
-    ax[0].set_title("DP Disparity Image")
+    ax[0].set_title("Upsampled Disparity Image")
     ax[1].imshow(img2)
     ax[1].set_title("Ground Truth Disparity Image")
     ax[2].imshow(filled_after)

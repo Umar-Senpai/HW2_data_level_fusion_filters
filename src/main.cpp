@@ -616,7 +616,7 @@ void Iterative_Upsampling(const cv::Mat& input, const cv::Mat& depth, cv::Mat& o
 
 int main(int argc, char** argv) {
 	if (argc < 3) {
-		std::cerr << "Usage: " << argv[0] << "PATH_TO_IMAGE_PAIR OUTPUT_FILE" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " PATH_TO_IMAGE_PAIR OUTPUT_FILE" << std::endl;
 		return 1;
 	}
 
@@ -652,6 +652,7 @@ int main(int argc, char** argv) {
 	im += noise;
 
 	cv::imshow("Image with Noise", im);
+	cv::imwrite("Noise.png", im);
 	//cv::waitKey();
 
 	cv::Mat output = cv::Mat::zeros(im.rows, im.cols, CV_8UC1);
@@ -670,20 +671,24 @@ int main(int argc, char** argv) {
 	// cv::bilateralFilter(im, output, window_size, 2 * window_size, window_size / 2);
 	// cv::imshow("bilateral", output);
 
+	std::string output_new = output_file + "_window_" + std::to_string(window_size) + "_sigma_" + std::to_string(sigmaRange);
 	OurFiler(im, output);
 	cv::imshow("OurFiler", output);
+	cv::imwrite("Gaussian.png", output);
 
 	std::cout << "----- OUR GAUSSIAN FILTER ERRORS -----" << std::endl;
 	calculateAndPrintErrors(output, gt_image);
 
 	OurBilateralFiler(im, output);
 	cv::imshow("OurBilateralFiler", output);
+	cv::imwrite("OurBilateralFiler.png", output);
 
 	std::cout << "----- OUR BILATERAL FILTER ERRORS -----" << std::endl;
 	calculateAndPrintErrors(output, gt_image);
 
 	OurBilateralMedianFiler(im, output);
 	cv::imshow("OurBilateralMedianFiler", output);
+	cv::imwrite("OurBilateralMedianFiler.png", output);
 
 	std::cout << "----- OUR BILATERAL MEDIAN FILTER ERRORS -----" << std::endl;
 	calculateAndPrintErrors(output, gt_image);
@@ -701,6 +706,7 @@ int main(int argc, char** argv) {
 	matching_time = ((double)cv::getTickCount() - matching_time)/cv::getTickFrequency();
   	outfileTime << "JB: " << matching_time << " seconds" << std::endl;
 	cv::imshow("OurJointBilateralFiler", output);
+	cv::imwrite("OurJointBilateralFiler.png", output);
 
 	std::cout << "----- OUR JOINT BILATERAL FILTER ERRORS -----" << std::endl;
 	calculateAndPrintErrors(output, gt_depth);
@@ -709,6 +715,7 @@ int main(int argc, char** argv) {
 	OurJointBilateralMedianFiler(color, depth, output, window_size, sigmaRange);
 	matching_time = ((double)cv::getTickCount() - matching_time)/cv::getTickFrequency();
   	outfileTime << "JBM: " << matching_time << " seconds" << std::endl;
+	cv::imwrite("OurJointBilateralMedianFiler.png", output);
 	cv::imshow("OurJointBilateralMedianFiler", output);
 
 	std::cout << "----- OUR JOINT BILATERAL MEDIAN FILTER ERRORS -----" << std::endl;
@@ -718,6 +725,7 @@ int main(int argc, char** argv) {
 	OurJointBilateralUpsamplingFiler(color, lowres_depth, output, window_size, sigmaRange);
 	matching_time = ((double)cv::getTickCount() - matching_time)/cv::getTickFrequency();
   	outfileTime << "JBU: " << matching_time << " seconds" << std::endl;
+	cv::imwrite("OurJointBilateralUpsamplingFiler.png", output);
 	cv::imshow("OurJointBilateralUpsamplingFiler", output);
 
 	std::cout << "----- OUR JOINT BILATERAL UPSAMPLING FILTER ERRORS -----" << std::endl;
@@ -727,6 +735,7 @@ int main(int argc, char** argv) {
 	OurJointBilateralMedianUpsamplingFiler(color, lowres_depth, output, window_size, sigmaRange);
 	matching_time = ((double)cv::getTickCount() - matching_time)/cv::getTickFrequency();
   	outfileTime << "JBMU: " << matching_time << " seconds" << std::endl;
+	cv::imwrite("OurJointBilateralMedianUpsamplingFiler.png", output);
 	cv::imshow("OurJointBilateralMedianUpsamplingFiler", output);
 
 	std::cout << "----- OUR JOINT BILATERAL MEDIAN UPSAMPLING FILTER ERRORS -----" << std::endl;
@@ -736,6 +745,7 @@ int main(int argc, char** argv) {
 	Iterative_Upsampling(color, lowres_depth, output, window_size, sigmaRange);
 	matching_time = ((double)cv::getTickCount() - matching_time)/cv::getTickFrequency();
   	outfileTime << "IU: " << matching_time << " seconds" << std::endl;
+	cv::imwrite("Iterative_Upsampling.png", output);
 	cv::imshow("Iterative_Upsampling", output);
 	std::cout << "----- Iterative_Upsampling FILTER ERRORS -----" << std::endl;
 	calculateAndPrintErrors(output, gt_depth);
@@ -748,58 +758,61 @@ int main(int argc, char** argv) {
         = { "Aloe", "Art", "Baby1", "Books", "Bowling1", "Dolls", "Flowerpots", "Laundry", "Moebius", "Monopoly", "Reindeer", "Wood1" };
 
 	
+	double window_size_arr[3] = {3, 5, 7};
 	// double window_size_arr[3] = {3, 5, 7};
-	// // double window_size_arr[3] = {3, 5, 7};
-	// for (int i = 0; i < 12; ++i){
-	// 	std::cout
-	// 		<< "Upsampling on the given dataset "
-	// 		<< std::ceil(((i + 1) / 12.0 * 100)) << "%\r"
-	// 		<< std::flush;
+	
+	// THIS CODE IS FOR EVALUATION ON 12 IMAGES. IT TAKES A BIT OF TIME (5 minutes)
+	// YOU CAN COMMENT IT IF YOU HAVE JUST DOWNLOADED THE RESULTS FROM GITHUB
+	for (int i = 0; i < 12; ++i){
+		std::cout
+			<< "Upsampling on the given dataset "
+			<< std::ceil(((i + 1) / 12.0 * 100)) << "%\r"
+			<< std::flush;
 
-	// 	dataFolderPath = "../data/" + dataset[i];
-	// 	std::string output_folder = "../results/" + dataset[i];
-	// 	cv::Mat image = cv::imread(dataFolderPath + "/view1.png", cv::IMREAD_GRAYSCALE);
-	// 	cv::Mat disparity = cv::imread(dataFolderPath + "/disp1.png", cv::IMREAD_GRAYSCALE);
-	// 	cv::Mat lowres_disparity = cv::imread(dataFolderPath + "/lowres_disp1.png", cv::IMREAD_GRAYSCALE);
+		dataFolderPath = "../data/" + dataset[i];
+		std::string output_folder = "../results/" + dataset[i];
+		cv::Mat image = cv::imread(dataFolderPath + "/view1.png", cv::IMREAD_GRAYSCALE);
+		cv::Mat disparity = cv::imread(dataFolderPath + "/disp1.png", cv::IMREAD_GRAYSCALE);
+		cv::Mat lowres_disparity = cv::imread(dataFolderPath + "/lowres_disp1.png", cv::IMREAD_GRAYSCALE);
 		
-	// 	for (int j = 0; j < 3; ++j){	
-	// 		window_size = window_size_arr[j];
-	// 		output = cv::Mat::zeros(image.rows, image.cols, CV_8UC1);
-	// 		double time_taken = 0;
+		for (int j = 0; j < 3; ++j){	
+			window_size = window_size_arr[j];
+			output = cv::Mat::zeros(image.rows, image.cols, CV_8UC1);
+			double time_taken = 0;
 
-	// 		std::string output_file = output_folder + "_window_" + std::to_string(window_size);
+			std::string output_file = output_folder + "_window_" + std::to_string(window_size);
 
-	// 		std::stringstream errors;
-	// 		errors << output_file << "_errors.txt";
-	// 		std::ofstream outfileErrors(errors.str());
+			std::stringstream errors;
+			errors << output_file << "_errors.txt";
+			std::ofstream outfileErrors(errors.str());
 
-	// 		std::stringstream time;
-	// 		time << output_file << "_processing_time.txt";
-	// 		std::ofstream outfileTime(time.str());
+			std::stringstream time;
+			time << output_file << "_processing_time.txt";
+			std::ofstream outfileTime(time.str());
 
-	// 		time_taken = (double)cv::getTickCount();
-	// 		OurJointBilateralUpsamplingFiler(image, lowres_disparity, output, window_size, sigmaRange);
-	// 		time_taken = ((double)cv::getTickCount() - time_taken)/cv::getTickFrequency();
-	// 		outfileTime << "JBU: " << time_taken << " seconds" << std::endl;
-	// 		calculateAndWriteErrors(output, disparity, outfileErrors);
-	// 		cv::imwrite(output_file + "_JBU.png", output);
+			time_taken = (double)cv::getTickCount();
+			OurJointBilateralUpsamplingFiler(image, lowres_disparity, output, window_size, sigmaRange);
+			time_taken = ((double)cv::getTickCount() - time_taken)/cv::getTickFrequency();
+			outfileTime << "JBU: " << time_taken << " seconds" << std::endl;
+			calculateAndWriteErrors(output, disparity, outfileErrors);
+			cv::imwrite(output_file + "_JBU.png", output);
 
-	// 		time_taken = (double)cv::getTickCount();
-	// 		OurJointBilateralMedianUpsamplingFiler(image, lowres_disparity, output, window_size, sigmaRange);
-	// 		time_taken = ((double)cv::getTickCount() - time_taken)/cv::getTickFrequency();
-	// 		outfileTime << "JBMU: " << time_taken << " seconds" << std::endl;
-	// 		calculateAndWriteErrors(output, disparity, outfileErrors);
-	// 		cv::imwrite(output_file + "_JBMU.png", output);
+			time_taken = (double)cv::getTickCount();
+			OurJointBilateralMedianUpsamplingFiler(image, lowres_disparity, output, window_size, sigmaRange);
+			time_taken = ((double)cv::getTickCount() - time_taken)/cv::getTickFrequency();
+			outfileTime << "JBMU: " << time_taken << " seconds" << std::endl;
+			calculateAndWriteErrors(output, disparity, outfileErrors);
+			cv::imwrite(output_file + "_JBMU.png", output);
 
-	// 		time_taken = (double)cv::getTickCount();
-	// 		Iterative_Upsampling(image, lowres_disparity, output, window_size, sigmaRange);
-	// 		time_taken = ((double)cv::getTickCount() - time_taken)/cv::getTickFrequency();
-	// 		outfileTime << "IU: " << time_taken << " seconds" << std::endl;
-	// 		calculateAndWriteErrors(output, disparity, outfileErrors);
-	// 		cv::imwrite(output_file + "_IU.png", output);
-	// 	}
+			time_taken = (double)cv::getTickCount();
+			Iterative_Upsampling(image, lowres_disparity, output, window_size, sigmaRange);
+			time_taken = ((double)cv::getTickCount() - time_taken)/cv::getTickFrequency();
+			outfileTime << "IU: " << time_taken << " seconds" << std::endl;
+			calculateAndWriteErrors(output, disparity, outfileErrors);
+			cv::imwrite(output_file + "_IU.png", output);
+		}
 
-	// }
+	}
 
 	double sigma_arr[10] = {0.01, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 25.0, 50.0, 100.0};
 	for (int i = 0; i < 3; ++i){
