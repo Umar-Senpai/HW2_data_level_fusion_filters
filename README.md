@@ -1,4 +1,4 @@
-# HW2_data_level_fusion_filters
+# Data Level Fusion Filters using Point Cloud Library with QT5/VTK GUI
 This repository contains the solution to homework 2 for 3D Sensing and Sensor Fusion course
 
 ## Subtask 1: Algorithms
