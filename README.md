@@ -1,5 +1,5 @@
 # Data Level Fusion Filters using Point Cloud Library with QT5/VTK GUI
-This repository contains the solution to homework 2 for 3D Sensing and Sensor Fusion course
+This repository contains the solution to homework 2 for 3D Sensing and Sensor Fusion course at ELTE, Budapest. It implements different filters using C++ and 3D displays with GUI using Point Cloud Library enabled with VTK and QT. 
 
 ## Subtask 1: Algorithms
 The main C++ file in `/src` named `main.cpp` implements the different algorithms for filtering and upsampling images. The implemented algorithms are:
